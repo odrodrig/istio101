@@ -11,4 +11,4 @@ spec:
     - route:
         - destination:
             host: guestbook
-            subset: v1
+            subset: v2

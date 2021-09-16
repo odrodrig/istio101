@@ -1,4 +1,4 @@
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: destination-rule-guestbook
@@ -11,3 +11,6 @@ spec:
   - name: v2
     labels:
       version: "2.0"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
