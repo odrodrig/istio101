@@ -9,23 +9,22 @@ An Ingress Gateway resource can be created to allow external requests through th
 1. Configure the guestbook default route with the Istio Ingress Gateway. The `guestbook-gateway.yaml` file is in this repository (istio101) in the `docs/plans` directory.
 
     ```shell
-    cd $WORK_DIR/istio101/docs/plans
-    oc create -f guestbook-gateway.yaml
+    oc create -f $WORK_DIR/istio101/docs/plans/guestbook-gateway.yaml
     ```
 
 1. Get the OpenShift route that is automatically created.
 
     ```shell
-    oc get route -n istio-system | grep guestbook
+    GUESTBOOK_ROUTE=$(oc get route -n istio-system  -o=jsonpath='{.items[1].spec.host}')
+
+    echo $GUESTBOOK_ROUTE
     ```
 
-    You should see the following:
+    You should see something like the following:
 
     ![route output](../README_images/routeOutput.png)
 
-1. You can navigate to your deployed guestbook application by copying the route printed out in the previous command
-
-SAVE ROUTE
+1. You can navigate to your deployed guestbook application by copying the route printed out in the previous command and pasting it in a new browser tab.
 
 Congrats you have exposed your service externally using an Istio Gateway and an OpenShift route. Continue on to see how you can use Istio to manage traffic between two different application versions.
 

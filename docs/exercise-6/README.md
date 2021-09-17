@@ -22,7 +22,7 @@ In the Guestbook app, there is one service: guestbook. The guestbook service has
 
 ### A/B testing with Istio
 
-A/B testing is a method of performing identical tests against two separate service versions in order to determine which performs better. To prevent Istio from performing the default routing behavior between the original and modernized guestbook service, define the following rules (found in [istio101/docs/plans](https://github.com/IBM/odrodrig/tree/openshift-service-mesh/docs/plans)):
+A/B testing is a method of performing identical tests against two separate service versions in order to determine which performs better. To prevent Istio from performing the default routing behavior between the original and modernized guestbook service, define the following rules (found in [istio101/docs/plans](https://github.com/odrodrig/istio101/tree/openshift-service-mesh/docs/plans)):
 
 ```shell
 oc create -f $WORK_DIR/istio101/docs/plans/guestbook-destination.yaml
@@ -123,7 +123,7 @@ Try opening up your route in a Firefox browser and then try it again with a diff
 In `Canary Deployments`, newer versions of services are incrementally rolled out to users to minimize the risk and impact of any bugs introduced by the newer version. To begin incrementally routing traffic to the newer version of the guestbook service, modify the original `VirtualService` rule:
 
 ```shell
-oc replace -f virtualservice-80-20.yaml
+oc replace -f $WORK_DIR/istio101/docs/plans/virtualservice-80-20.yaml
 ```
 
 Let's examine the rule:

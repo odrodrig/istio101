@@ -8,7 +8,7 @@ The Guestbook app is a sample app for users to leave comments. It consists of a 
 1. Clone the Guestbook app into the `workshop` directory.
 
     ```shell
-    export WORK_DIR=$(pwd)
+    cd $WORK_DIR
     git clone -b openshift-service-mesh https://github.com/odrodrig/guestbook.git
     ```
 
@@ -18,7 +18,7 @@ The Guestbook app is a sample app for users to leave comments. It consists of a 
     cd guestbook/v2
     ```
 
-## Enable the automatic sidecar injection for the default namespace
+## Enable the automatic sidecar injection
 
 In Kubernetes, a sidecar is a utility container in the pod, and its purpose is to support the main container. For Istio to work, Envoy proxies must be deployed as sidecars to each pod of the deployment. In Istio on Kubernetes it is possible to enable automatic sidecar injection for all pods in a namespace, however, in OpenShift with OpenShift Service Mesh this is not possible. Instead, you must enable sidecar injection for each deployment. This is so temporary workloads like build containers do not get a sidecar. Enabling sidecar injection in a deployment can be done with a simple annotation in the deployment object.
 
@@ -72,10 +72,10 @@ The Redis database is a service that you can use to persist the data of your app
 1. Create the Redis deployments and services for both the master and the slave.
 
     ``` shell
-    oc create -f redis-master-deployment.yaml
-    oc create -f redis-master-service.yaml
-    oc create -f redis-slave-deployment.yaml
-    oc create -f redis-slave-service.yaml
+    oc create -f $WORK_DIR/guestbook/v2/redis-master-deployment.yaml
+    oc create -f $WORK_DIR/guestbook/v2/redis-master-service.yaml
+    oc create -f $WORK_DIR/guestbook/v2/redis-slave-deployment.yaml
+    oc create -f $WORK_DIR/guestbook/v2/redis-slave-service.yaml
     ```
 
 1. Verify that the Redis deployments for the master and the slave are created.
@@ -123,7 +123,7 @@ The Redis database is a service that you can use to persist the data of your app
 
 ## Install the Guestbook app
 
-1. Inject the Istio Envoy sidecar into the guestbook pods, and deploy the Guestbook app on to the Kubernetes cluster. Deploy both the v1 and v2 versions of the app:
+1. Deploy the Guestbook app on to the OpenShift cluster. Deploy both the v1 and v2 versions of the app:
 
     ```shell
     oc apply -f $WORK_DIR/guestbook/v1/guestbook-deployment.yaml

@@ -15,9 +15,10 @@ In order to complete the lab, you will need to access to your OpenShift cluster 
 1. From your command line, run:
 
     ```shell
-    git clone https://github.com/IBM/istio101
+    export WORK_DIR=$(pwd)
 
-    cd istio101/workshop
+    git clone -b openshift-service-mesh https://github.com/odrodrig/istio101
+
     ```
 
     This is the working directory for the workshop. You will use the example `.yaml` files that are located in the `workshop/plans` directory in the following exercises.

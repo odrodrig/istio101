@@ -19,7 +19,7 @@ It's important that you install the operators that are supplied by `Red Hat` and
 
     ![elasticsearch](../README_images/elasticsearchOperator.png)
 
-    - Then select the `stable-5.x` update channel and accept the rest of the default values.
+    - Then select the `stable-5.2` update channel and accept the rest of the default values.
 
     - Click `Install`
 
@@ -73,7 +73,7 @@ It's important that you install the operators that are supplied by `Red Hat` and
 
     ![installed operators](../README_images/installedOperators.png)
 
-1. Select the `Red Hat OpenShift Service Mesh` operator and change into the `istio-system` project by using the `Project` drop down near the top of the page as seen below:
+1. Change into the `istio-system` project by using the `Project` dropdown at the upper left side of the page. Then, select the `Red Hat OpenShift Service Mesh` operator:
 
     ![project dropdown](../README_images/projectDropdown.png)
 
@@ -83,7 +83,7 @@ It's important that you install the operators that are supplied by `Red Hat` and
 
     - Accept all of the defaults and click on the blue `Create` button at the bottom of the page.
 
-1. Next, select the `Istio Service Mesh Member Roll` tab and click on the blue `Create ServiceMeshMemberRoll` button.
+1. Next, select the `Istio Service Mesh Member Roll` tab and click on the blue `Create ServiceMeshMemberRoll` button. This member roll will tell the Istio control plane which projects to monitor.
 
     ![smmr button](../README_images/smmrButton.png)
 
@@ -94,6 +94,19 @@ It's important that you install the operators that are supplied by `Red Hat` and
         ![smmr yaml](../README_imges/smmrYaml.png)
 
     - When done, click `create`
+
+1. Before you continue you will need to ensure that the Service Mesh Control Plane is ready. Run the following command to view the status:
+
+    ```bash
+    oc get smcp -n istio-system
+    ```
+
+    You should see the following when it is ready.
+
+    ```bash
+    NAME    READY   STATUS            PROFILES      VERSION   AGE
+    basic   9/9     ComponentsReady   ["default"]   2.0.7.1   3m19s
+    ```
 
 With the installation of the Istio Control Plane done we can move on to installing the guestbook application.
 
