@@ -1,15 +1,15 @@
 # Exercise 3 - Deploy the Guestbook app with Istio Proxy
 
-The Guestbook app is a sample app for users to leave comments. It consists of a web front end, Redis master for storage, and a replicated set of Redis slaves. We will also integrate the app with Watson Tone Analyzer which detects the sentiment in users' comments and replies with emoticons.
+The Guestbook app is a sample app for users to leave comments. It consists of a web front end, Redis master for storage, and a replicated set of Redis slaves. 
 
-![Guestbook applicaiton topology](../README_images/istio1.jpg)
 
 ## Download the Guestbook app
 
 1. Clone the Guestbook app into the `workshop` directory.
 
     ```shell
-    git clone -b kubecon2019 https://github.com/IBM/guestbook
+    export WORK_DIR=$(pwd)
+    git clone -b openshift-service-mesh https://github.com/odrodrig/guestbook.git
     ```
 
 1. Navigate into the app directory.
@@ -20,46 +20,68 @@ The Guestbook app is a sample app for users to leave comments. It consists of a 
 
 ## Enable the automatic sidecar injection for the default namespace
 
-In Kubernetes, a sidecar is a utility container in the pod, and its purpose is to support the main container. For Istio to work, Envoy proxies must be deployed as sidecars to each pod of the deployment. There are two ways of injecting the Istio sidecar into a pod: manually using the istioctl CLI tool or automatically using the Istio sidecar injector. In this exercise, we will use the automatic sidecar injection provided by Istio.
+In Kubernetes, a sidecar is a utility container in the pod, and its purpose is to support the main container. For Istio to work, Envoy proxies must be deployed as sidecars to each pod of the deployment. In Istio on Kubernetes it is possible to enable automatic sidecar injection for all pods in a namespace, however, in OpenShift with OpenShift Service Mesh this is not possible. Instead, you must enable sidecar injection for each deployment. This is so temporary workloads like build containers do not get a sidecar. Enabling sidecar injection in a deployment can be done with a simple annotation in the deployment object.
 
-1. Annotate the default namespace to enable automatic sidecar injection:
+1. For each deployment that you want to enable sidecar injection with, you will need to add the annotation `sidecar.istio.io/inject: "true"` to the deployment object. For the purposes of this workshop, this has already been done for the guestbook and redis deployments. Run the following command to view the guestbook deployment and the sidecar injection annotation:
 
-    ``` shell
-    kubectl label namespace default istio-injection=enabled
+    ```bash
+    cat $WORK_DIR/guestbook/v2/guestbook-deployment.yaml
+    ```
+    
+    You should see the following:
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+        name: guestbook-v2
+        labels:
+            app: guestbook
+            version: "2.0"
+    spec:
+        selector:
+            matchLabels:
+                app: guestbook
+        replicas: 3
+        template:
+            metadata:
+                labels:
+                    app: guestbook
+                    version: "2.0"   
+                annotations:
+                    sidecar.istio.io/inject: "true"
+            spec:
+                containers:
+                - name: guestbook
+                    image: ibmcom/guestbook:v2
+                    resources:
+                        requests:
+                            cpu: 100m
+                            memory: 100Mi
+                    ports:
+                    - name: http
+                    containerPort: 3000
     ```
 
-1. Validate the namespace is annotated for automatic sidecar injection:
-
-    ``` shell
-    kubectl get namespace -L istio-injection
-    ```
-
-    Sample output:
-
-    ``` shell
-    NAME             STATUS   AGE    ISTIO-INJECTION
-    default          Active   271d   enabled
-    istio-system     Active   5d2h
-    ...
-    ```
+    Notice the `sidecar.istio.io/inject: "true"` annotation at `spec.template.metadata.annotations`.
 
 ## Create a Redis database
 
 The Redis database is a service that you can use to persist the data of your app. The Redis database comes with a master and slave modules.
 
-1. Create the Redis controllers and services for both the master and the slave.
+1. Create the Redis deployments and services for both the master and the slave.
 
     ``` shell
-    kubectl create -f redis-master-deployment.yaml
-    kubectl create -f redis-master-service.yaml
-    kubectl create -f redis-slave-deployment.yaml
-    kubectl create -f redis-slave-service.yaml
+    oc create -f redis-master-deployment.yaml
+    oc create -f redis-master-service.yaml
+    oc create -f redis-slave-deployment.yaml
+    oc create -f redis-slave-service.yaml
     ```
 
-1. Verify that the Redis controllers for the master and the slave are created.
+1. Verify that the Redis deployments for the master and the slave are created.
 
     ```shell
-    kubectl get deployment
+    oc get deployment
     ```
 
     Output:
@@ -73,7 +95,7 @@ The Redis database is a service that you can use to persist the data of your app
 1. Verify that the Redis services for the master and the slave are created.
 
     ```shell
-    kubectl get svc
+    oc get svc
     ```
 
     Output:
@@ -87,7 +109,7 @@ The Redis database is a service that you can use to persist the data of your app
 1. Verify that the Redis pods for the master and the slave are up and running.
 
     ```shell
-    kubectl get pods
+    oc get pods
     ```
 
     Output:
@@ -104,22 +126,22 @@ The Redis database is a service that you can use to persist the data of your app
 1. Inject the Istio Envoy sidecar into the guestbook pods, and deploy the Guestbook app on to the Kubernetes cluster. Deploy both the v1 and v2 versions of the app:
 
     ```shell
-    kubectl apply -f ../v1/guestbook-deployment.yaml
-    kubectl apply -f guestbook-deployment.yaml
+    oc apply -f $WORK_DIR/guestbook/v1/guestbook-deployment.yaml
+    oc apply -f $WORK_DIR/guestbook/v2/guestbook-deployment.yaml
     ```
 
-    These commands deploy the Guestbook app on to the Kubernetes cluster. Since we enabled automation sidecar injection, these pods will be also include an Envoy sidecar as they are started in the cluster. Here we have two versions of deployments, a new version (`v2`) in the current directory, and a previous version (`v1`) in a sibling directory. They will be used in future sections to showcase the Istio traffic routing capabilities.
+    These commands deploy the Guestbook app on to the OpenShift cluster. Since we enabled automation sidecar injection, these pods will be also include an Envoy sidecar as they are started in the cluster. Here we have two versions of deployments, a new version (`v2`) in the current directory, and a previous version (`v1`) in a sibling directory. They will be used in future sections to showcase the Istio traffic routing capabilities.
 
 1. Create the guestbook service.
 
     ```shell
-    kubectl create -f guestbook-service.yaml
+    oc create -f $WORK_DIR/guestbook/v2/guestbook-service.yaml
     ```
 
 1. Verify that the service was created.
 
     ```shell
-    kubectl get svc
+    oc get svc
     ```
 
     Output:
@@ -133,7 +155,7 @@ The Redis database is a service that you can use to persist the data of your app
 1. Verify that the pods are up and running.
 
     ```shell
-    kubectl get pods
+    oc get pods
     ```
 
     Sample output:
@@ -152,38 +174,5 @@ The Redis database is a service that you can use to persist the data of your app
     ```
 
     Note that each guestbook pod has 2 containers in it. One is the guestbook container, and the other is the Envoy proxy sidecar.
-
-## Use Watson Tone Analyzer
-
-Watson Tone Analyzer detects the tone from the words that users enter into the Guestbook app. The tone is converted to the corresponding emoticons.
-
-1. Create Watson Tone Analyzer in your account.
-
-    ```shell
-    ibmcloud resource service-instance-create my-tone-analyzer-service tone-analyzer lite us-south
-    ```
-
-1. Create the service key for the Tone Analyzer service. This command should output the credentials you just created. You will need the value for **apikey** & **url** later.
-
-    ```shell
-    ibmcloud resource service-key-create tone-analyzer-key Manager --instance-name my-tone-analyzer-service
-    ```
-
-1. If you need to get the service-keys later, you can use the following command:
-
-    ```shell
-    ibmcloud resource service-key tone-analyzer-key
-    ```
-
-1. Open the `analyzer-deployment.yaml` and find the env section near the end of the file. Replace `YOUR_API_KEY` with your own API key, and replace `YOUR_URL` with the url value you saved before. YOUR_URL should look something like `https://gateway.watsonplatform.net/tone-analyzer/api`. Save the file.
-
-1. Deploy the analyzer pods and service, using the `analyzer-deployment.yaml` and `analyzer-service.yaml` files found in the `guestbook/v2` directory. The analyzer service talks to Watson Tone Analyzer to help analyze the tone of a message. Ensure you are still in the `guestbook/v2` directory.
-
-    ```shell
-    kubectl apply -f analyzer-deployment.yaml
-    kubectl apply -f analyzer-service.yaml
-    ```
-
-Great! Your guestbook app is up and running. In Exercise 4, you'll be able to see the app in action by directly accessing the service endpoint. You'll also be able to view Telemetry data for the app.
 
 ## [Continue to Exercise 4 - Telemetry](../exercise-4/README.md)

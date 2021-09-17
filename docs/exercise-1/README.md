@@ -1,64 +1,14 @@
-# Exercise 1 - Accessing a Kubernetes cluster with IBM Cloud Kubernetes Service
+# Exercise 1 - Accessing an OpenShift cluster with IBM Cloud Kubernetes Service
 
-You must already have a [cluster created](https://cloud.ibm.com/docs/containers?topic=containers-clusters#clusters_standard). Your cluster must have **3 or more worker nodes** with at least **4 cores and 16GB RAM**, and run Kubernetes version 1.16 or later.
+You must already have an OpenShift cluster in order to complete the lab. Your cluster must have **3 or more worker nodes** with at least **4 cores and 16GB RAM** and run OpenShift 4.6 or greater.
 
-## Install IBM Cloud Kubernetes Service command line utilities
+## Access IBM Cloud Shell 
 
-1. Download and install the required CLI tools.
-
-    ```shell
-    curl -sL https://ibm.biz/idt-installer | bash
-    ```
-
-1. Log in to the IBM Cloud CLI. (If you have a federated account, include the `--sso` flag.)
-
-    ```shell
-    ibmcloud login
-    ```
+For this workshop we will be using IBM Cloud Shell which contains many tools needed without having to worry about installing anything locally. You can access the IBM Cloud Shell [here](https://cloud.ibm.com/shell).
 
 ## Access your cluster
 
-Learn how to set the context to work with your cluster by using the `kubectl` CLI, access the Kubernetes dashboard, and gather basic information about your cluster.
-
-1. Set the context for your cluster in your CLI. Every time you log in to the IBM Cloud Kubernetes Service CLI to work with the cluster, you must run these commands to set the path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
-
-    a. List the available clusters.
-
-    ```shell
-    ibmcloud ks clusters
-    ```
-
-    b. Set an environment variable for your cluster name:
-
-    ```shell
-    export MYCLUSTER=<your_cluster_name>
-    ```
-
-    c. Download the configuration file and certificates for your cluster using the `cluster-config` command.
-
-    ```shell
-    ibmcloud ks cluster config --cluster $MYCLUSTER
-    ```
-
-1. Get basic information about your cluster and its worker nodes. This information can help you manage your cluster and troubleshoot issues.
-
-    a.  View details of your cluster.
-
-    ```shell
-    ibmcloud ks cluster get --cluster $MYCLUSTER
-    ```
-
-    b.  Verify the worker nodes in the cluster.
-
-    ```shell
-    ibmcloud ks workers --cluster $MYCLUSTER
-    ```
-
-1. Validate access to your cluster by viewing the nodes in the cluster.
-
-    ```shell
-    kubectl get nodes
-    ```
+In order to complete the lab, you will need to access to your OpenShift cluster from your terminal. This can be done by following the instructions found [here](https://ibm.github.io/workshop-setup/ROKS/)
 
 ## Clone the lab repo
 
@@ -72,4 +22,4 @@ Learn how to set the context to work with your cluster by using the `kubectl` CL
 
     This is the working directory for the workshop. You will use the example `.yaml` files that are located in the `workshop/plans` directory in the following exercises.
 
-### [Continue to Exercise 2 - Installing Istio](../exercise-2/README.md)
+### [Continue to Exercise 2 - Installing OpenShift Service Mesh](../exercise-2/README.md)

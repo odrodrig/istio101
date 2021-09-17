@@ -1,10 +1,103 @@
-# Exercise 2 - Installing Istio on IBM Cloud Kubernetes Service
+# Exercise 2 - Installing OpenShift Service Mesh on OpenShift
 
-In this module, you will use the Managed Istio add-on to install Istio on your cluster.
+In this module, you will install the OpenShift Service Mesh operator and then use that oprator to install the Istio control plane. 
 
-Managed Istio is available as part of IBM Cloud™ Kubernetes Service. The service provides seamless installation of Istio, automatic updates and lifecycle management of control plane components, and integration with platform logging and monitoring tools.
+Before we install of OpenShift Service Mesh operator, there are a few prerequisite installations we need to do first. These operators need to be installed in the following order:
 
-1. Download the `istioctl` CLI and add it to your PATH:
+- OpenShift Elasticsearch Operator
+- OpenShift Jaegar Operator
+- OpenShift Kiali Operator
+- OpenShift Service Mesh Operator
+
+It's important that you install the operators that are supplied by `Red Hat` and not the `community` versions.
+
+1. Navigate to your OpenShift Console in your browser and navigate to the `Operators` -> `OperatorHub` section from the navigation tabs on the left side of the page.
+
+    ![operator hub](../README_images/operatorHub.png)
+
+1. Then search for OpenShift Elasticsearch Operator and select the following option:
+
+    ![elasticsearch](../README_images/elasticsearchOperator.png)
+
+    - Then select the `stable-5.x` update channel and accept the rest of the default values.
+
+    - Click `Install`
+
+    - The Operator will take a few seconds to install but you can move on while it is installing.
+
+1. Next, go back to the OperatorHub page and search for `openshift jaeger` and click on the `Red Hat OpenShift Jaeger` operator.
+
+    ![jaeger operator](../README_images/jaegerOperator.png)
+
+    - Select the `stable` update channel and accept the rest of the default values
+
+    - Click `Install`
+
+    - The Operator will take a few seconds to install but you can move on while it is installing.
+
+1. Then, go back to the OperatorHub page and search for `kiali` and click on the `kiali` operator. Ensure it is the one that says `Provided by Red Hat`
+
+    ![kiali operator](../README_images/kialiOperator.png)
+
+    - Select the `stable` update channel and accept the rest of the default values
+
+    - Click `Install`
+
+    - The Operator will take a few seconds to install but you can move on while it is installing.
+
+1. Lastly, go back to the OperatorHub page and search for `service mesh` and select the `Red Hat OpenShift Service Mesh` operator.
+
+    ![service mesh operator](../README_images/serviceMeshOperator.png)
+
+    - Select the `stable` update channel and accept the rest of the default values
+
+    - Click `Install`
+
+    - The Operator will take a few seconds to install but you can move on while it is installing.
+
+    With the necessary operators installed, now we can create the Istio control plane.
+
+1. Create a new project in which we will install the Istio control plane. In your terminal environment, run the following command:
+
+    ```bash
+    oc new-project istio-system
+    ```
+
+1. While you are in the terminal, create the guestbook project if it doesn't exist already.
+
+    ```bash
+    oc new-project guestbook
+    ```
+
+1. From the OpenShift console, navigate to the `Operators` -> `Installed Operators` page.
+
+    ![installed operators](../README_images/installedOperators.png)
+
+1. Select the `Red Hat OpenShift Service Mesh` operator and change into the `istio-system` project by using the `Project` drop down near the top of the page as seen below:
+
+    ![project dropdown](../README_images/projectDropdown.png)
+
+1. On the next page, select the tab for `Istio Service Mesh Control Plane` and click on the blue `Create ServiceMeshControlPlane` button. 
+
+    ![smcp button](../README_images/smcpButton.png)
+
+    - Accept all of the defaults and click on the blue `Create` button at the bottom of the page.
+
+1. Next, select the `Istio Service Mesh Member Roll` tab and click on the blue `Create ServiceMeshMemberRoll` button.
+
+    ![smmr button](../README_images/smmrButton.png)
+
+    - On the next page select the option to configure via yaml view
+
+    - In the yaml editor change the `spec.members` list to contain only the `guestbook` project as seen below:
+
+        ![smmr yaml](../README_imges/smmrYaml.png)
+
+    - When done, click `create`
+
+With the installation of the Istio Control Plane done we can move on to installing the guestbook application.
+
+<!-- 1. Download the `istioctl` CLI and add it to your PATH:
 
    ```shell
    curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.5.6 sh -
@@ -12,49 +105,6 @@ Managed Istio is available as part of IBM Cloud™ Kubernetes Service. The servi
 
    ```shell
    export PATH=$PWD/istio-1.5.6/bin:$PATH
-   ```
-
-1. Enable Managed Istio on your IKS cluster:
-
-    ```shell
-    ibmcloud ks cluster addon enable istio --cluster $MYCLUSTER
-    ```
-
-1. The install can take up to 10 minutes. Ensure the corresponding pods are all in **`Running`** state before you continue.
-
-    ```shell
-    kubectl get pods -n istio-system
-    ```
-
-    Sample output:
-
-    ```shell
-    NAME                                     READY   STATUS    RESTARTS   AGE
-
-istio-egressgateway-6c966469cc-52t6f    1/1     Running   0          69s
-istio-egressgateway-6c966469cc-qq5qd    1/1     Running   0          55s
-istio-ingressgateway-7698c7b4f4-69c24   1/1     Running   0          68s
-istio-ingressgateway-7698c7b4f4-qttzh   1/1     Running   0          54s
-istiod-cbb98c74d-2wvql                  1/1     Running   0          54s
-istiod-cbb98c74d-kcr4d                  1/1     Running   0          67s
-    ```
-
-> **NOTE** Before you continue, make sure all the pods are deployed and either in the **`Running`** or **`Completed`** state. If they're in `pending` state, wait a few minutes to let the installation and deployment finish.
-
-1. Check the version of your Istio:
-
-    ```shell
-    istioctl version
-    ```
-
-    Sample output:
-
-    ```shell
-    client version: 1.5.6
-    control plane version: 1.5.6
-    data plane version: 1.5.6 (4 proxies)
-    ```
-
-    Congratulations! You successfully installed Istio into your cluster.
+   ``` -->
 
 ## [Continue to Exercise 3 - Deploy Guestbook with Istio Proxy](../exercise-3/README.md)
