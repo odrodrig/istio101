@@ -4,13 +4,55 @@
 
 You must already have an OpenShift cluster in order to complete the lab. Your cluster must have **3 or more worker nodes** with at least **4 cores and 16GB RAM** and run OpenShift 4.6 or greater.
 
-### Access IBM Cloud Shell 
-
-For this workshop we will be using IBM Cloud Shell which contains many tools needed without having to worry about installing anything locally. You can access the IBM Cloud Shell [here](https://cloud.ibm.com/shell).
-
 ### Access your cluster
 
-In order to complete the lab, you will need to access to your OpenShift cluster from your terminal. This can be done by following the instructions found [here](https://ibm.github.io/workshop-setup/ROKS/)
+In order to complete the lab, you will need to access to your OpenShift cluster from your terminal. 
+
+### Login to IBM Cloud
+
+To login to IBM Cloud,
+
+1. Go to [https://cloud.ibm.com](https://cloud.ibm.com) in your browser and login.
+
+1. Make sure that you are in the correct account#.
+
+    ![Account Number](../README_images/account-number.png)
+
+>Note: you may not have access to your OpenShift cluster if you are not in the right account#.
+
+### Shell
+
+Most of the labs are run using CLI commands.
+
+The IBM Cloud Shell available at [https://shell.cloud.ibm.com](https://shell.cloud.ibm.com) is preconfigured with the full IBM Cloud CLI and tons of plug-ins and tools that you can use to manage apps, resources, and infrastructure.
+
+### Login to OpenShift
+
+1. In a new browser tab, go to [https://cloud.ibm.com/kubernetes/clusters?platformType=openshift](https://cloud.ibm.com/kubernetes/clusters?platformType=openshift).
+
+1. Make sure the account holding the cluster is selected,
+
+1. Select your cluster instance and open it.
+
+1. Click `OpenShift web console` button on the top.
+
+    ![IBM Cloud OpenShift Web Console](../README_images/ibmcloud-openshift-webconsole.png)
+
+1. Click on your username in the upper right and select `Copy Login Command` option.
+
+    ![Terminal Button](../README_images/copy-openshift-cmd.png)
+
+1. Click the `Display Token` link.
+
+    ![OpenShift Display Token](../README_images/openshift-display-token.png)
+
+1. Copy the contents of the field `Log in with this token` to the clipboard. It provides a login command with a valid token for your username.
+
+    ![OpenShift oc login](../README_images/openshift-oc-login.png)
+
+1. Go to the your shell terminal.
+
+1. Paste the `oc login command` in the IBM Cloud Shell terminal and run it.
 
 ### Clone the lab repo
 
